@@ -1,67 +1,114 @@
 # 🔗 URL Shortener Service
+### **Enterprise-grade, Scalable, and Analytics-driven API**
 
-A production-ready **URL Shortener API** that converts long URLs into short, reliable links and redirects users seamlessly to the original destination.  
-The system supports **API key–based access**, **detailed analytics**, and **strict rate limiting** to ensure security, performance, and fair usage.
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+---
+
+## 📖 Overview
+
+A high-performance **URL Shortener API** built with a focus on **security**, **observability**, and **resilience**. This service transforms long, cumbersome URLs into optimized aliases while providing granular analytics and dual-layer rate limiting to prevent infrastructure abuse.
+
+Built for developers who need a production-ready solution that prioritizes clean code and architectural integrity.
+
+---
+
+## 🏗 System Architecture
+
+The project follows a **Modular Controller-Service-Repository** pattern. This ensures a strict separation of concerns, making the codebase unit-testable and easy to scale.
+
+### **Design Philosophy**
+* **Decoupled Logic:** Controllers handle HTTP concerns, while Services contain the core business logic.
+* **Middleware-First Security:** Authentication and Rate Limiting are injected at the routing layer.
+* **Data Integrity:** Mongoose schemas ensure strict validation before any write operations.
 
 ---
 
 ## 🚀 Key Features
 
-- Generate a **shortened URL** from a long URL
-- Redirect short URLs to the original URL
-- **API key–based access control**
-- **Analytics tracking** for each shortened URL
-  - Total clicks
-  - Timestamp-based usage data
-- **Rate limiting** to prevent abuse
-- Scalable and clean controller–service architecture
+* **⚡ High-Speed Redirection:** Optimized database queries for sub-100ms redirects.
+* **🛡️ Dual-Layer Rate Limiting:** Separate logic for API consumers vs. end-user clicks.
+* **📊 Granular Analytics:** Track engagement with timestamps and total click counts.
+* **🔐 API Key Security:** Protects the creation endpoint from unauthorized public use.
+* **🧩 Scalable Design:** Ready for containerization and horizontal scaling.
 
 ---
 
-## 🛠 Tech Stack
+## 🚦 Traffic Management (Rate Limiting)
 
-- **Backend:** Node.js, Express.js  
-- **Database:** MongoDB (Mongoose)  
-- **Language:** JavaScript  
-- **Security:** API Key, Rate Limiter  
-- **Tools:** Postman, Nodemon  
+To ensure high availability and prevent "noisy neighbor" issues, the service implements a strict traffic policy:
+
+| Type | Limit | Window | Purpose |
+| :--- | :--- | :--- | :--- |
+| **API Usage** | 50 Requests | 2 Hours | Prevents API Key / IP scraping & abuse. |
+| **Link Clicks** | 5 Clicks | 2 Minutes | Mitigates bot-driven click inflation. |
+
+> [!IMPORTANT]
+> Exceeding these limits triggers a **HTTP 429 – Too Many Requests** response to protect system resources.
 
 ---
-Redirect Shortened URL
 
-GET /:shortCode
+## 📖 API Documentation
 
-➡️ Redirects to the original long URL and records analytics.
+### **1. URL Operations**
 
-📊 Analytics
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/shorten` | Create a shortened URL | **Yes (API Key)** |
+| `GET` | `/r/:code` | Redirect to original URL | No |
+| `GET` | `/analytics/:code` | Get click-through data | **Yes (API Key)** |
+| `PUT` | `/shorten/:code` | Update a shortened URL | **Yes (API Key)** |
 
-Each shortened URL tracks:
+#### **Example Request: Shorten URL**
+```json
+// POST /shorten
+// Header: x-api-key: YOUR_KEY
+{
+  "longUrl": "[https://developer.mozilla.org/en-US/docs/Web/JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)"
+}
+```
+---
 
-Total number of clicks
+## 🛠 Tech Stack & Tools
 
-Click timestamps
-
-Usage patterns per short URL
-
-This data helps monitor traffic and detect misuse.
-
-🚦 Rate Limiting Rules
-1️⃣ API Usage Rate Limiter
-
-A user can hit any link up to 50 times within 2 hours
-
-Enforced using API key and IP-based tracking
-
-2️⃣ Link Click Rate Limiter
-
-The same shortened link can be clicked only 5 times within 2 minutes
-
-Prevents automated or abusive repeated clicks
-
-If limits are exceeded, the API responds with a 429 Too Many Requests error.
+| Component | Technology |
+| :--- | :--- |
+| **Backend** | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=nodedotjs&logoColor=white) (LTS), Express.js |
+| **Database** | ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white) via Mongoose ODM |
+| **Security** | `express-rate-limit`, `Helmet.js`, API Key Middleware |
+| **DevOps/Tools** | Postman, Nodemon, Morgan (Logging) |
 
 
-👨‍💻 Author
 
-Subhaprakash Nayak
-Senior Software Engineer
+---
+
+## ⚙️ Installation & Setup
+
+Follow these steps to get your local development environment up and running.
+
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/your-username/url-shortener.git](https://github.com/your-username/url-shortener.git](https://github.com/psubha936/shortenUrl))
+cd shortenUrl 
+
+2. Install Dependencies
+Bash
+npm install
+3. Environment Configuration
+Create a .env file in the root directory and populate it with the following variables:
+
+Code snippet
+# Server Configuration
+PORT=xxxxx
+BASE_URL=xxxxx
+
+# Database Configuration
+MONGO_URI=your_mongodb_connection_string
+
+```
+<h2>🧪 Phase 2 – Redis Integration</h2> <p> In the next phase, the system will integrate <strong>Redis</strong> to improve performance, scalability, and traffic handling under high concurrency. </p> <ul> <li>🚦 <strong>Distributed Rate Limiting</strong> across API keys, IPs, and short URLs</li> <li>⚡ <strong>Hot URL Caching</strong> for faster redirection and reduced DB reads</li> <li>📊 <strong>Real-time Analytics Buffering</strong> with batch persistence</li> <li>🔁 <strong>Horizontal Scalability</strong> for multi-instance deployments</li> </ul> <blockquote> <strong>Note:</strong> Redis enables consistent rate limits and analytics even in distributed, high-traffic environments. </blockquote>
+
+<hr/> <h2 align="center">👨‍💻 Crafted By</h2> <p align="center"> <strong>✨ Subhaprakash Nayak ✨</strong><br/> Senior Software Engineer<br/><br/> 🚀 Backend Engineering & API Architecture<br/> 💡 Clean Code • Scalable Systems • Production Mindset </p> <hr/>
