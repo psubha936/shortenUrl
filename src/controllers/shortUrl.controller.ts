@@ -88,7 +88,12 @@ export const update = async (
 
     res.status(HttpStatus.OK).json({
       success: true,
-      data: updated
+      data: {
+        originalUrl: updated.originalUrl,
+        shortUrl: buildShortUrl(updated.shortCode),
+        clicks: updated.clicks,
+        createdAt: updated.createdAt,
+      }
     });
   } catch (error) {
     logger.error(LogMessages.UPDATE_URL_FAILED, {
