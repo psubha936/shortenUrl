@@ -27,6 +27,14 @@ export const createShortUrl = async (
     createdByKey: apiKey._id.toString(),
   });
 
+  if (!/^https?:\/\//i.test(originalUrl)) {
+    originalUrl = `https://${originalUrl}`;
+    logger.info(LogMessages.SHORT_URL_CREATED, {
+      originalUrl,
+      createdByKey: apiKey._id.toString(),
+    });
+  }
+
   return ShortUrlModel.create({
     originalUrl,
     shortCode: generateShortCode(),
